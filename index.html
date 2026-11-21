@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>华为工龄计算器 · HUAWEI</title>
+<style>
+  :root {
+    --huawei-red: #cf0a2c;
+    --huawei-red-deep: #9e0019;
+    --huawei-red-glow: rgba(207, 10, 44, .55);
+    --ink: #0b0d12;
+    --muted: #8a94a6;
+    --line: rgba(255, 255, 255, .08);
+    --glass: rgba(255, 255, 255, .05);
+    --glass-strong: rgba(255, 255, 255, .10);
+    --text: #eef1f6;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    color: var(--text);
+    font-family: "HarmonyOS Sans SC", "HarmonyOS Sans", "PingFang SC",
+      "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(900px 500px at 85% -10%, rgba(207,10,44,.35), rgba(207,10,44,0) 60%),
+      radial-gradient(800px 600px at 0% 110%, rgba(207,10,44,.25), rgba(207,10,44,0) 60%),
+      linear-gradient(160deg, #0b0d12 0%, #14171f 50%, #0b0d12 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+  }
+
+  /* 背景网格 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, rgba(0,0,0,.9), transparent 75%);
+    pointer-events: none;
+  }
+
+  /* 光斑 */
+  .orb {
+    position: fixed;
+    width: 520px; height: 520px;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .55;
+    pointer-events: none;
+    animation: float 14s ease-in-out infinite;
+  }
+  .orb.a { background: #cf0a2c; top: -120px; right: -100px; }
+  .orb.b { background: #5c0010; bottom: -160px; left: -140px; animation-delay: -6s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(20px, -30px) scale(1.08); }
+  }
+
+  /* 主卡片 */
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: linear-gradient(160deg, rgba(22,25,33,.9) 0%, rgba(14,16,22,.92) 100%);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    padding: 38px 38px 30px;
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow:
+      0 40px 80px -30px rgba(0,0,0,.7),
+      0 0 0 1px rgba(255,255,255,.02) inset;
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(600px 180px at 50% -100px, rgba(207,10,44,.28), transparent 60%);
+    pointer-events: none;
+  }
+
+  /* 顶部品牌区 */
+  .hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  /* 华为 LOGO 容器 */
+  .logo-wrap {
+    position: relative;
+    width: 84px; height: 84px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #1a1d26, #0e1016);
+    border: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow:
+      0 10px 30px -8px rgba(207,10,44,.45),
+      0 0 0 1px rgba(207,10,44,.25) inset;
+    margin-bottom: 16px;
+    animation: pulse 3.5s ease-in-out infinite;
+  }
+  .logo-wrap::after {
+    content: "";
+    position: absolute; inset: -6px;
+    border-radius: 26px;
+    background: radial-gradient(closest-side, rgba(207,10,44,.35), transparent 70%);
+    filter: blur(10px);
+    z-index: -1;
+    animation: pulseGlow 3.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.03); }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { opacity: .6; }
+    50%      { opacity: 1; }
+  }
+
+  .logo-wrap svg {
+    width: 60px; height: 60px;
+    filter: drop-shadow(0 2px 6px rgba(207,10,44,.6));
+  }
+
+  .brand-name {
+    font-size: 12px;
+    letter-spacing: .32em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-size: 28px;
+    line-height: 1.25;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: .02em;
+    background: linear-gradient(180deg, #ffffff 0%, #cdd3dc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* 输入区 */
+  form { margin-top: 26px; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #c5cbd6;
+    margin-bottom: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .field {
+    display: flex;
+    gap: 12px;
+  }
+  .input-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+  input[type="date"] {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #fff;
+    background: rgba(255,255,255,.04);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    color-scheme: dark;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(.8);
+    cursor: pointer;
+  }
+  input[type="date"]:focus {
+    border-color: rgba(207,10,44,.7);
+    background: rgba(207,10,44,.06);
+    box-shadow: 0 0 0 4px rgba(207,10,44,.15);
+  }
+
+  button {
+    height: 52px;
+    padding: 0 26px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #e0133a 0%, #b5092a 100%);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform .1s, box-shadow .2s, filter .2s;
+    white-space: nowrap;
+    letter-spacing: .02em;
+    box-shadow:
+      0 6px 20px -4px rgba(207,10,44,.6),
+      0 0 0 1px rgba(255,255,255,.08) inset;
+  }
+  button:hover { filter: brightness(1.1); box-shadow: 0 8px 26px -4px rgba(207,10,44,.75); }
+  button:active { transform: translateY(1px); }
+
+  .error {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #ff5d6c;
+    min-height: 18px;
+  }
+
+  /* 结果区 */
+  .result {
+    margin-top: 24px;
+    background: linear-gradient(160deg, rgba(207,10,44,.14), rgba(207,10,44,.04));
+    border: 1px solid rgba(207,10,44,.22);
+    border-radius: 18px;
+    padding: 22px 22px 18px;
+    display: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .result::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e0133a, transparent);
+    opacity: .85;
+  }
+  .result.show { display: block; animation: rise .5s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-label {
+    font-size: 12px;
+    color: #c5cbd6;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .days {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 8px 0 2px;
+  }
+  #daysNum {
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(180deg, #ffffff 0%, #e0133a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+  }
+  .days-unit {
+    font-size: 16px;
+    color: #c5cbd6;
+    font-weight: 600;
+  }
+  .breakdown {
+    font-size: 13.5px;
+    color: #c5cbd6;
+    margin-top: 6px;
+  }
+  .breakdown strong { color: #fff; }
+
+  .meta {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(255,255,255,.1);
+    display: grid;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .meta-row { display: flex; justify-content: space-between; gap: 12px; }
+  .meta-row span:last-child { color: #eef1f6; font-variant-numeric: tabular-nums; }
+
+  /* 额外信息网格 */
+  .extra {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .extra .tile {
+    background: var(--glass);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .tile .v {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .tile .l {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: .04em;
+  }
+
+  .footnote {
+    margin-top: 22px;
+    font-size: 11.5px;
+    color: #657089;
+    line-height: 1.7;
+    text-align: center;
+  }
+  .footnote a { color: #8a94a6; text-decoration: none; }
+
+  @media (max-width: 420px) {
+    .card { padding: 32px 22px 24px; border-radius: 22px; }
+    h1 { font-size: 24px; }
+    #daysNum { font-size: 52px; }
+    .field { flex-direction: column; }
+    button { width: 100%; }
+    .extra { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb a"></div>
+<div class="orb b"></div>
+
+<main class="card">
+
+  <!-- Hero + 华为 LOGO -->
+  <div class="hero">
+    <div class="logo-wrap" aria-label="HUAWEI">
+      <!-- 华为 LOGO SVG：8 片花瓣 + 中心，红色渐变 -->
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="petalGrad" cx="50%" cy="35%" r="70%">
+            <stop offset="0%"  stop-color="#ff3a5c" />
+            <stop offset="55%" stop-color="#e0133a" />
+            <stop offset="100%" stop-color="#9e0019" />
+          </radialGradient>
+          <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"  stop-color="#ffffff" stop-opacity=".85" />
+            <stop offset="60%" stop-color="#ffd8df" stop-opacity=".35" />
+            <stop offset="100%" stop-color="#cf0a2c" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <!-- 8 片花瓣，用 path 画泪滴形状 -->
+        <g fill="url(#petalGrad)">
+          <!-- 上 -->
+          <path d="M50 14
+                   C54 28,  58 40, 50 50
+                   C42 40,  46 28, 50 14 Z" />
+          <!-- 右上 -->
+          <path d="M76 24
+                   C68 32,  60 40, 50 50
+                   C60 40,  72 36, 76 24 Z" transform="rotate(0 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(45 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(90 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(135 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(180 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(225 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(270 50 50)"/>
+          <path d="M50 14 C54 28, 58 40, 50 50 C42 40, 46 28, 50 14 Z" transform="rotate(315 50 50)"/>
+        </g>
+
+        <!-- 中心亮核 -->
+        <circle cx="50" cy="50" r="16" fill="url(#coreGrad)"/>
+        <circle cx="50" cy="50" r="4"  fill="#ffd8df" opacity=".9"/>
+      </svg>
+    </div>
+    <div class="brand-name">HUAWEI · 工龄</div>
+    <h1>我在华为待了多少天</h1>
+    <p class="subtitle">与华为一起走过的每一个自然日，都值得被记住。</p>
+  </div>
+
+  <form id="form">
+    <label for="joinDate">入职日期</label>
+    <div class="field">
+      <div class="input-wrap">
+        <input type="date" id="joinDate" name="joinDate" required />
+      </div>
+      <button type="submit">计算</button>
+    </div>
+    <div class="error" id="error"></div>
+  </form>
+
+  <section class="result" id="result">
+    <div class="result-label">在华为工作的总天数</div>
+    <div class="days">
+      <span id="daysNum">0</span>
+      <span class="days-unit">天</span>
+    </div>
+    <div class="breakdown" id="breakdown"></div>
+
+    <div class="extra">
+      <div class="tile"><div class="v" id="yNum">0</div><div class="l">年</div></div>
+      <div class="tile"><div class="v" id="mNum">0</div><div class="l">月</div></div>
+      <div class="tile"><div class="v" id="wNum">0</div><div class="l">周</div></div>
+    </div>
+
+    <div class="meta">
+      <div class="meta-row"><span>入职日期</span><span id="metaStart">—</span></div>
+      <div class="meta-row"><span>计算至</span><span id="metaEnd">—</span></div>
+    </div>
+  </section>
+
+  <p class="footnote">按自然日计算，包含入职当天；未扣除周末与节假日。</p>
+</main>
+
+<script>
+(function () {
+  var form = document.getElementById('form');
+  var input = document.getElementById('joinDate');
+  var errorEl = document.getElementById('error');
+  var result = document.getElementById('result');
+  var daysNum = document.getElementById('daysNum');
+  var breakdownEl = document.getElementById('breakdown');
+  var metaStart = document.getElementById('metaStart');
+  var metaEnd = document.getElementById('metaEnd');
+  var yNum = document.getElementById('yNum');
+  var mNum = document.getElementById('mNum');
+  var wNum = document.getElementById('wNum');
+  var MS_PER_DAY = 86400000;
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function fmt(d) { return d.getFullYear() + '年' + pad(d.getMonth() + 1) + '月' + pad(d.getDate()) + '日'; }
+  function fmtISO(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+
+  function countDays(y, m, d) {
+    var today = new Date();
+    var startUTC = Date.UTC(y, m - 1, d);
+    var endUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+    return Math.floor((endUTC - startUTC) / MS_PER_DAY) + 1;
+  }
+
+  function ymd(y, m, d) {
+    var today = new Date();
+    var start = new Date(y, m - 1, d);
+    var yy = today.getFullYear() - start.getFullYear();
+    var mm = today.getMonth() - start.getMonth();
+    var dd = today.getDate() - start.getDate();
+    if (dd < 0) {
+      mm--;
+      dd += daysInMonth(today.getFullYear(), today.getMonth() - 1);
+    }
+    if (mm < 0) { yy--; mm += 12; }
+    return { y: yy, m: mm, d: dd };
+  }
+
+  function render(days, y, m, d) {
+    var today = new Date();
+    metaStart.textContent = fmt(new Date(y, m - 1, d));
+    metaEnd.textContent = fmt(today);
+
+    var info = ymd(y, m, d);
+    var parts = [];
+    if (info.y > 0) parts.push('<strong>' + info.y + '</strong> 年');
+    if (info.m > 0) parts.push('<strong>' + info.m + '</strong> 个月');
+    parts.push('<strong>' + info.d + '</strong> 天');
+    breakdownEl.innerHTML = '约 ' + parts.join(' ') + '（按自然日累计）';
+
+    yNum.textContent = info.y;
+    mNum.textContent = info.m;
+    wNum.textContent = Math.floor(days / 7);
+
+    result.classList.remove('show');
+    void result.offsetWidth;
+    result.classList.add('show');
+
+    // 数字滚动
+    var from = 0, to = days, dur = 700, t0 = performance.now();
+    function step(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      daysNum.textContent = Math.round(from + (to - from) * eased).toLocaleString('zh-CN');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  input.max = fmtISO(new Date());
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errorEl.textContent = '';
+
+    if (!input.value) {
+      errorEl.textContent = '请先选择入职日期。';
+      result.classList.remove('show');
+      return;
+    }
+
+    var y = parseInt(input.value.slice(0, 4), 10);
+    var m = parseInt(input.value.slice(5, 7), 10);
+    var d = parseInt(input.value.slice(8, 10), 10);
+    var days = countDays(y, m, d);
+
+    if (days < 1) {
+      errorEl.textContent = '入职日期不能晚于今天。';
+      result.classList.remove('show');
+      return;
+    }
+
+    render(days, y, m, d);
+  });
+})();
+</script>
+</body>
+</html>
